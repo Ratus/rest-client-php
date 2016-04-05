@@ -58,8 +58,8 @@ class Mapper implements MapperInterface
 
                         //fetch the data
                         $result = array_merge(
-                            $this->runMap($data[$dkey], $value, $index),
-                            $result
+                            $result,
+                            $this->runMap($data[$dkey], $value, $index)
                         );
                     }
 

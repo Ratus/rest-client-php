@@ -142,6 +142,11 @@ class Client
             $mapcheck = false;
         }
 
+        //catch error
+        if(is_null($classname)) {
+            $classname = 'array';
+        }
+
         //handle classname
         if(is_string($classname)) {
             switch($classname) {
@@ -158,7 +163,7 @@ class Client
         }
 
         //handle strings
-        if(is_string($data)) {
+        if( is_string($data) || is_array($data) ) {
             $data = $this->destring($data);
         }
 
@@ -193,6 +198,10 @@ class Client
      */
     protected function destring($data)
     {
+        if(is_array($data)) {
+            $data = json_encode($data);
+        }
+        
         //try json
         try {
             return json_decode($data);
