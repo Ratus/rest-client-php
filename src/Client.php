@@ -127,13 +127,13 @@ class Client
 
                     //check if it exists
                     try {
-                        new $mapclass();
+                        $mapper = new $mapclass();
                     } catch (\Exception $e) {
                         //nope, don't map
                         break;
                     }
 
-                    $data = $mapclass::standardize($data, $resource);
+                    $data = $mapper->standardize($data, $resource);
 
                     break;
             }

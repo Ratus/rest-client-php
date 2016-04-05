@@ -16,15 +16,15 @@ class Mapper implements MapperInterface
      * @param string $resource
      * @return array
      */
-    public static function standardize($data = '', $resource = '')
+    public function standardize($data = '', $resource = '')
     {
-        if(!($map = self::getMap($resource))) {
+        if(!($map = $this->getMap($resource))) {
             //don't do anything if we can't map
             return $data;
         }
         
         //Fetch flat array of the data
-        $result = self::runMap($data, $map);
+        $result = $this->runMap($data, $map);
 
         //return a deepened array
         return self::addDepth($result);
@@ -37,7 +37,7 @@ class Mapper implements MapperInterface
      *
      * @return array
      */
-    protected static function runMap($data = '', $map = [], $index = [])
+    protected function runMap($data = '', $map = [], $index = [])
     {
         //first, make the data useful to us
         $data = self::deserialize($data);
@@ -58,7 +58,7 @@ class Mapper implements MapperInterface
 
                         //fetch the data
                         $result = array_merge(
-                            self::runMap($data[$dkey], $value, $index),
+                            $this->runMap($data[$dkey], $value, $index),
                             $result
                         );
                     }
@@ -88,7 +88,7 @@ class Mapper implements MapperInterface
                             //we're not done yet
 
                             $result = array_merge(
-                                self::runMap($data[$key], $value, $index),
+                                $this->runMap($data[$key], $value, $index),
                                 $result
                             );
 
