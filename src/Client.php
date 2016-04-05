@@ -180,6 +180,9 @@ class Client
             return json_decode(json_encode($data), true);
         }
 
+        //catch an error waiting to occur
+        if(is_null($data)) return null;
+
         return $this->getMapper()->map($data, $classname);
     }
 
