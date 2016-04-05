@@ -1,0 +1,19 @@
+{
+    "name": "finwo/rest-client",
+    "description": "Generic REST client",
+    "require": {
+        "netresearch/jsonmapper": "^0.10.0"
+    },
+    "authors": [
+        {
+            "name": "Robin Bron",
+            "email": "robin@finwo.nl"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Finwo\\RestClient\\": "src"
+        }
+    },
+    "minimum-stability": "dev"
+}
