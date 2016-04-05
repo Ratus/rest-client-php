@@ -174,8 +174,14 @@ class Client
 
         //handle arrays
         if(is_array($data)) {
-            foreach($data as $key=>$value) {
-                $data[$key] = $this->deserialize($value, $classname, $mapcheck);
+            foreach($data as $key => $value) {
+                
+                //to not overwrite data
+                $tmp = $classname;
+                if(is_object($classname)) $tmp = get_class($classname);
+
+                //handle the data
+                $data[$key] = $this->deserialize($value, $tmp, $mapcheck);
             }
             return $data;
         }
@@ -201,7 +207,7 @@ class Client
         if(is_array($data)) {
             $data = json_encode($data);
         }
-        
+
         //try json
         try {
             return json_decode($data);
