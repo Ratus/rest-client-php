@@ -7,7 +7,7 @@ class Mapper implements MapperInterface
     /**
      * @var array
      */
-    protected $fullmap;
+    protected $fullmap = [];
 
     /**
      * Standardizes data from the API to data array
