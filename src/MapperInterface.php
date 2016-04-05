@@ -11,5 +11,5 @@ interface MapperInterface
      *
      * @return array
      */
-    public function getMap($resource = '');
+    public static function getMap($resource = '');
 }
