@@ -4,6 +4,10 @@ namespace Finwo\RestClient;
 
 abstract class Mapper implements MapperInterface
 {
+    /**
+     * @var array
+     */
+    protected $fullmap;
 
     /**
      * Standardizes data from the API to data array
@@ -152,5 +156,26 @@ abstract class Mapper implements MapperInterface
         });
 
         return $output;
+    }
+
+    /**
+     * @param string $resource
+     *
+     * @return bool
+     */
+    public static function getMap($resource = '')
+    {
+        $map = $this->fullmap;
+        $path = explode('/', $resource);
+
+        while(count($path)) {
+            try {
+                $map = $map[array_shift($path)];
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        return $map;
     }
 }
