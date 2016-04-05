@@ -2,7 +2,7 @@
 
 namespace Finwo\RestClient;
 
-abstract class Mapper implements MapperInterface
+class Mapper implements MapperInterface
 {
     /**
      * @var array
@@ -163,7 +163,7 @@ abstract class Mapper implements MapperInterface
      *
      * @return bool
      */
-    public static function getMap($resource = '')
+    public function getMap($resource = '')
     {
         $map = $this->fullmap;
         $path = explode('/', $resource);
