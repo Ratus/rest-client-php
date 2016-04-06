@@ -1,5 +1,5 @@
 {
-    "name": "finwo/rest-client",
+    "name": "ratus/rest-client-php",
     "description": "Generic REST client",
     "require": {
         "netresearch/jsonmapper": "^0.10.0"

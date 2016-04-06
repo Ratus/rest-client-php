@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3811f291cb590115bcb725aba6386666",
-    "content-hash": "4f9a2797beb19e3a69b72ef7eba97ab5",
+    "hash": "701cc243f2e3f323caaffa1ab0e97441",
+    "content-hash": "0b2b08d5dcba83bcdf3ce39df49dc04c",
     "packages": [
         {
             "name": "netresearch/jsonmapper",
