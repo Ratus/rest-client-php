@@ -5,11 +5,27 @@ namespace Ratus\RestClient;
 interface MapperInterface
 {
     /**
-     * Returns an array map of how to transform the data
+     * Standardizes data from the API to data array
      *
+     * @param string $data
+     * @param string $resource
+     * @param bool   $reverseMap
+     *
+     * @return array|string
+     */
+    public function standardize($data = '', $resource = '', $reverseMap = false);
+
+    /**
      * @param string $resource
      *
-     * @return array
+     * @return bool|array
      */
     public function getMap($resource = '');
+
+    /**
+     * @param string $resource
+     *
+     * @return bool|array
+     */
+    public function getReverseMap($resource = '');
 }

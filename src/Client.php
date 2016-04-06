@@ -63,6 +63,11 @@ class Client
     {
         //generate uri
         $uri = $this->baseuri . '/' . $resource;
+        
+        //reverse map the data if needed
+        if(!!$mapcheck) {
+            $data = $this->deserialize($data, null, $mapcheck, $resource, true);
+        }
 
         //add optional query
         $query = http_build_query($data);
@@ -112,11 +117,12 @@ class Client
      * @param null   $classname
      * @param bool   $mapcheck
      * @param string $resource
+     * @param bool   $reverse
      *
-     * @return array|null|object
+     * @return array|null|object|string
      * @throws \JsonMapper_Exception
      */
-    protected function deserialize($data, $classname = null, $mapcheck = false, $resource = '')
+    protected function deserialize($data, $classname = null, $mapcheck = false, $resource = '', $reverse = false)
     {
         if(!!$mapcheck) {
             switch ($mapcheck) {
@@ -127,13 +133,14 @@ class Client
 
                     //check if it exists
                     try {
+                        /** @var MapperInterface $mapper */
                         $mapper = new $mapclass();
                     } catch (\Exception $e) {
                         //nope, don't map
                         break;
                     }
 
-                    $data = $mapper->standardize($data, $resource);
+                    $data = $mapper->standardize($data, $resource, $reverse);
 
                     break;
             }

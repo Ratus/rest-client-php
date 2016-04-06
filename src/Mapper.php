@@ -7,18 +7,27 @@ class Mapper implements MapperInterface
     /**
      * @var array
      */
-    protected $fullmap = array();
+    protected $fullMap = array();
+
+    /**
+     * @var array
+     */
+    protected $fullReverseMap = array();
 
     /**
      * Standardizes data from the API to data array
      *
      * @param string $data
      * @param string $resource
-     * @return array
+     * @param bool   $reverseMap
+     *
+     * @return array|string
      */
-    public function standardize($data = '', $resource = '')
+    public function standardize($data = '', $resource = '', $reverseMap = false)
     {
-        if(!($map = $this->getMap($resource))) {
+        $func = !!$reverseMap ? 'getReverseMap' : 'getMap' ;
+
+        if(!($map = call_user_func(array($this, $func), $resource))) {
             //don't do anything if we can't map
             return $data;
         }
@@ -165,7 +174,23 @@ class Mapper implements MapperInterface
      */
     public function getMap($resource = '')
     {
-        $map = $this->fullmap;
+        $map = $this->fullMap;
+        $path = explode('/', $resource);
+
+        while(count($path)) {
+            try {
+                $map = $map[array_shift($path)];
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
+
+        return $map;
+    }
+
+    public function getReverseMap($resource = '')
+    {
+        $map = $this->fullReverseMap;
         $path = explode('/', $resource);
 
         while(count($path)) {
