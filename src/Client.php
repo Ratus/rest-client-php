@@ -10,11 +10,11 @@ class Client
 
     protected $curl = null;
 
-    protected $cache = [
+    protected $cache = array(
         'server' => '127.0.0.1',
         'port'   => 11211,
         'time'   => 15
-    ];
+    );
 
     protected $mapperNamespace = '';
 
@@ -59,7 +59,7 @@ class Client
      *
      * @return mixed
      */
-    protected function get($resource = '', $data = [], $classname = 'array', $mapcheck = false)
+    protected function get($resource = '', $data = array(), $classname = 'array', $mapcheck = false)
     {
         //generate uri
         $uri = $this->baseuri . '/' . $resource;
