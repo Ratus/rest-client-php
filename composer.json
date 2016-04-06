@@ -2,11 +2,13 @@
     "name": "ratus/rest-client-php",
     "description": "Generic REST client",
     "require": {
+        "php":                    ">=5.3",
+        "ext-curl":               "*",
         "netresearch/jsonmapper": "^0.10.0"
     },
     "authors": [
         {
-            "name": "Robin Bron",
+            "name":  "Robin Bron",
             "email": "robin@finwo.nl"
         }
     ],
