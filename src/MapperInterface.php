@@ -1,6 +1,6 @@
 <?php
 
-namespace Finwo\RestClient;
+namespace Ratus\RestClient;
 
 interface MapperInterface
 {

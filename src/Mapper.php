@@ -1,13 +1,13 @@
 <?php
 
-namespace Finwo\RestClient;
+namespace Ratus\RestClient;
 
 class Mapper implements MapperInterface
 {
     /**
      * @var array
      */
-    protected $fullmap = [];
+    protected $fullmap = array();
 
     /**
      * Standardizes data from the API to data array
@@ -37,13 +37,13 @@ class Mapper implements MapperInterface
      *
      * @return array
      */
-    protected function runMap($data = '', $map = [], $index = [])
+    protected function runMap($data = '', $map = array(), $index = array())
     {
         //first, make the data useful to us
         $data = self::deserialize($data);
 
         //the array we'll build to
-        $result = [];
+        $result = array();
 
         //run through the map
         foreach($map as $key => $value) {
@@ -74,10 +74,10 @@ class Mapper implements MapperInterface
                     //see if we need translation
                     if($value instanceof \Closure) {
                         $result = array_merge(
-                            call_user_func_array($value, [
+                            call_user_func_array($value, array(
                                 $data[$key],
                                 $index
-                            ]),
+                            )),
                             $result
                         );
                     }
@@ -135,9 +135,9 @@ class Mapper implements MapperInterface
      *
      * @return array
      */
-    protected static function addDepth($input = [])
+    protected static function addDepth($input = array())
     {
-        $output = [];
+        $output = array();
 
         //loop through array elements
         array_walk($input, function($value, $path) use (&$output) {

@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Finwo\\RestClient\\": "src"
+            "Ratus\\RestClient\\": "src"
         }
     },
     "minimum-stability": "dev"
