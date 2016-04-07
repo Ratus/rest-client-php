@@ -96,7 +96,7 @@ class Client
         if ($useCache) {
             //use cache
             $key = md5(serialize(func_get_args()));
-            if(!$result = $this->cacheData($key)) {
+            if($result = $this->cacheData($key)) {
                 return $result;
             }
         }
