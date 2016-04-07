@@ -13,7 +13,7 @@ class Client
     protected $cache = array(
         'server' => '127.0.0.1',
         'port'   => 11211,
-        'time'   => 15
+        'time'   => 30
     );
 
     protected $mapperNamespace = '';
@@ -22,6 +22,11 @@ class Client
      * @var \JsonMapper
      */
     protected $mapper;
+
+    /**
+     * @var \Memcached
+     */
+    protected $memcached;
 
     /**
      * @return \JsonMapper
@@ -51,6 +56,31 @@ class Client
         }
     }
 
+    protected function cacheData($key, $newValue = null, $time = null)
+    {
+        //use default time of 30 or the object's
+        if(is_null($time)) {
+            $time = isset($this->cache['time']) ? intval($this->cache['time']) : 30 ;
+        }
+
+        //create memcached if we don't have it yet
+        if(is_null($this->memcached)) {
+            $this->memcached = new \Memcached();
+            $this->memcached->addServer($this->cache['server'], $this->cache['port']);
+        }
+
+        //fetch the memcached object
+        $memcached = $this->memcached;
+
+        //insert if needed
+        if(!is_null($newValue)) {
+            return $memcached->set($key, $newValue, $time);
+        }
+
+        //return the value at the key location
+        return $memcached->get($key);
+    }
+
     /**
      * @param string $resource
      * @param array  $data
@@ -61,6 +91,16 @@ class Client
      */
     protected function get($resource = '', $data = array(), $classname = 'array', $mapcheck = false)
     {
+        //use cache if we we're asked to
+        $useCache = isset($this->cache['time']) && !!$this->cache['time'] ;
+        if ($useCache) {
+            //use cache
+            $key = md5(serialize(func_get_args()));
+            if(!$result = $this->cacheData($key)) {
+                return $result;
+            }
+        }
+
         //generate uri
         $uri = $this->baseuri . '/' . $resource;
         
@@ -79,30 +119,12 @@ class Client
         curl_setopt($this->curl, CURLOPT_URL, $uri);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
 
+        //run request
+        $result = $this->deserialize(curl_exec($this->curl), $classname, $mapcheck, $resource);
 
-        if(
-            isset($this->cache['time']) &&
-            !!$this->cache['time']
-        ) {
-            //Setup memcached
-            $memcached = new \Memcached();
-            $memcached->addServer($this->cache['server'], $this->cache['port']);
-
-            //Load profiles from Memcached when exists else do API call
-            $key_location = md5(serialize(func_get_args()));
-
-            if (!$result = $memcached->get($key_location)) {
-
-                //perform API call
-                $result = $this->deserialize(curl_exec($this->curl), $classname, $mapcheck, $resource);
-
-                //cache it
-                $memcached->set($key_location, $result, $this->cache['time']);
-            }
-        } else {
-
-            //perform API call
-            $result = $this->deserialize(curl_exec($this->curl), $classname, $mapcheck, $resource);
+        //cache the result if we were asked to
+        if ($useCache) {
+            $this->cacheData($key, $result);
         }
 
         return $result;
