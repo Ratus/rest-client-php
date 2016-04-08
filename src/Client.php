@@ -89,7 +89,7 @@ class Client
      *
      * @return mixed
      */
-    protected function get($resource = '', $data = array(), $classname = 'array', $mapcheck = false)
+    public function get($resource = '', $data = array(), $classname = 'array', $mapcheck = false)
     {
         //use cache if we we're asked to
         $useCache = isset($this->cache['time']) && !!$this->cache['time'] ;
@@ -246,5 +246,19 @@ class Client
 
         //we tried, we failed
         return null;
+    }
+
+    /**
+     * Returns a fresh query object for the current client
+     * 
+     * @param string $resource
+     * @param string $classname
+     * @param bool   $mapcheck
+     *
+     * @return Query
+     */
+    protected function createQuery($resource = '', $classname = 'array', $mapcheck = false)
+    {
+        return new Query($this, $resource, $classname, $mapcheck);
     }
 }
