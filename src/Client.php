@@ -109,10 +109,12 @@ class Client
             $data = $this->deserialize($data, null, $mapcheck, $resource, true);
         }
 
+        //remove empty values
+        $data = $this->array_filter_recursive($data);
+
         //add optional query
-        $query = http_build_query($data);
-        if(strlen($query)) {
-            $uri .= '?' . $query;
+        if(count($data)) {
+            $uri .= '?' . http_build_query($data);
         }
 
         //set options
@@ -224,6 +226,19 @@ class Client
         if(is_null($data)) return null;
 
         return $this->getMapper()->map($data, $classname);
+    }
+
+    protected function array_filter_recursive($input)
+    {
+        foreach ($input as &$value)
+        {
+            if (is_array($value))
+            {
+                $value = $this->array_filter_recursive($value);
+            }
+        }
+
+        return array_filter($input);
     }
 
     /**
