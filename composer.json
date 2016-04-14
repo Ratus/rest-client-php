@@ -1,11 +1,7 @@
 {
     "name": "ratus/rest-client-php",
     "description": "Generic REST client",
-    "require": {
-        "php":                    ">=5.3",
-        "ext-curl":               "*",
-        "netresearch/jsonmapper": "^0.10.0"
-    },
+    "minimum-stability": "dev",
     "authors": [
         {
             "name":  "Robin Bron",
@@ -17,5 +13,10 @@
             "Ratus\\RestClient\\": "src"
         }
     },
-    "minimum-stability": "dev"
+    "require": {
+        "php":                    ">=5.3",
+        "ext-curl":               "*",
+        "finwo/cache-memcached":  "*@dev",
+        "netresearch/jsonmapper": "^0.10.0"
+    }
 }

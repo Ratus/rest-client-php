@@ -2,6 +2,9 @@
 
 namespace Ratus\RestClient;
 
+use Finwo\Cache\Cache;
+use Finwo\Cache\CacheInterface;
+
 class Client
 {
     protected $baseuri = '';
@@ -24,9 +27,9 @@ class Client
     protected $mapper;
 
     /**
-     * @var \Memcached
+     * @var CacheInterface
      */
-    protected $memcached;
+    protected $cacheObject;
 
     /**
      * @return \JsonMapper
@@ -58,27 +61,25 @@ class Client
 
     protected function cacheData($key, $newValue = null, $time = null)
     {
-        //use default time of 30 or the object's
+        // use default time of 30 or the object's
         if(is_null($time)) {
             $time = isset($this->cache['time']) ? intval($this->cache['time']) : 30 ;
         }
 
-        //create memcached if we don't have it yet
-        if(is_null($this->memcached)) {
-            $this->memcached = new \Memcached();
-            $this->memcached->addServer($this->cache['server'], $this->cache['port']);
-        }
+        // create cache object if we don't have it yet
+        if(is_null($this->cacheObject)) {
 
-        //fetch the memcached object
-        $memcached = $this->memcached;
+            // let the cache object detect what to use
+            $this->cacheObject = Cache::init('detect', $this->cache);
+        }
 
         //insert if needed
         if(!is_null($newValue)) {
-            return $memcached->set($key, $newValue, $time);
+            return $this->cacheObject->store($key, $newValue, $time);
         }
 
         //return the value at the key location
-        return $memcached->get($key);
+        return $this->cacheObject->fetch($key, $time);
     }
 
     /**
