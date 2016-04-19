@@ -115,18 +115,22 @@ class Client
         // pre-build accessor, we'll probably need it
         $accessor = $this->getPropertyAccessor();
 
+        // Pre-parse data
+        $data = Mapper::deserialize($data);
+
         // Default limit
         $limit = 60;
 
         // Fetch if we are able to return directly
-        $direct = !(
+        $direct = (
             is_null($offset = $accessor->get($data, $this->offsetLocalKey)) &&
             is_null($page   = $accessor->get($data, $this->pageLocalKey))
         );
 
         // Return directly if possible, saves us some work
         if ($direct) {
-            return $this->get($resource, $data, $classname, $mapcheck);
+
+            return $this->get($resource, json_encode($data), $classname, $mapcheck);
         }
 
         //handle first page of pagination
@@ -138,38 +142,39 @@ class Client
                         // It's a match, just rename the variable
                         $accessor->remove($data, $this->offsetLocalKey);
                         $accessor->set($data, $this->offsetRemoteKey);
+                        $data = json_encode($data);
                         return $this->get($resource, $data, $classname, $mapcheck);
                         break;
                     case 'page':
                         // Pagination needs simulation
                         $accessor->remove($data, $this->offsetLocalKey);
-                        $limit = $accessor->get($data, $this->limitLocalKey);
+                        $limit = intval($accessor->get($data, $this->limitLocalKey));
 
                         // Generate page numbers
-                        $pageLow  = floor($offset/$limit);
-                        $pageHigh = ceil($offset/$limit);
+                        $pageLow  = floor($offset/$limit)+1;
+                        $pageHigh = ceil($offset/$limit)+1;
 
                         // Fetch low data
                         $accessor->set($data, $this->pageRemoteKey, $pageLow);
-                        $dataLow  = $this->get($resource, $data, $classname, $mapcheck);
+                        $dataLow  = $this->get($resource, json_encode($data), $classname, $mapcheck);
 
                         // Fetch high data
                         $accessor->set($data, $this->pageRemoteKey, $pageHigh);
-                        $dataHigh = $this->get($resource, $data, $classname, $mapcheck);
+                        $dataHigh = $this->get($resource, json_encode($data), $classname, $mapcheck);
 
                         // Start building result
-                        $result = array_merge($dataLow, $dataHigh);
+                        $result = array_merge($dataHigh, $dataLow);
 
                         // Match offset & limit to the request, return that data
-                        $remove = $offset - ($limit * $pageLow);
-                        return array_filter($resource, function($item) use (&$limit, &$remove) {
+                        $remove = $offset-($limit*($pageLow-1));
+
+                        return array_filter($result, function($item) use (&$limit, &$remove) {
                             // Remove first X results
                             if (0<$remove--) {
                                 return false;
                             }
 
-                            // Limit to X results
-                            if (0<$limit--) {
+                            if (0>=$limit--) {
                                 return false;
                             }
 
@@ -219,7 +224,7 @@ class Client
 
         //generate uri
         $uri = $this->baseuri . '/' . $resource;
-        
+
         //reverse map the data if needed
         if(!!$mapcheck) {
             $data = $this->deserialize($data, null, $mapcheck, $resource, true);
@@ -330,7 +335,7 @@ class Client
         //handle arrays
         if(is_array($data)) {
             foreach($data as $key => $value) {
-                
+
                 //to not overwrite data
                 $tmp = $classname;
                 if(is_object($classname)) $tmp = get_class($classname);
@@ -389,7 +394,7 @@ class Client
 
     /**
      * Returns a fresh query object for the current client
-     * 
+     *
      * @param string $resource
      * @param string $classname
      * @param bool   $mapcheck
