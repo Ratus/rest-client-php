@@ -123,7 +123,15 @@ class Client
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
 
         //run request
-        $result = $this->deserialize(curl_exec($this->curl), $classname, $mapcheck, $resource);
+        $result = curl_exec($this->curl);
+
+        //break on error
+        if ($result === false) {
+            return false;
+        }
+
+        //deserialize what we got
+        $result = $this->deserialize($result, $classname, $mapcheck, $resource);
 
         //cache the result if we were asked to
         if ($useCache) {
