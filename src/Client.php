@@ -4,6 +4,7 @@ namespace Ratus\RestClient;
 
 use Finwo\Cache\Cache;
 use Finwo\Cache\CacheInterface;
+use Finwo\PropertyAccessor\PropertyAccessor;
 
 class Client
 {
@@ -19,12 +20,27 @@ class Client
         'time'   => 30
     );
 
+    // Settings for automatic pagination handling
+    protected $paginationType  = 'none';
+    protected $offsetType      = 'offset';
+    protected $offsetLocalKey  = 'offset';
+    protected $offsetRemoteKey = 'offset';
+    protected $pageLocalKey    = 'page';
+    protected $pageRemoteKey   = 'page';
+    protected $limitLocalKey   = 'limit';
+    protected $limitRemoteKey  = 'limit';
+
     protected $mapperNamespace = '';
 
     /**
      * @var \JsonMapper
      */
     protected $mapper;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $accessor;
 
     /**
      * @var CacheInterface
@@ -41,6 +57,18 @@ class Client
         }
 
         return $this->mapper;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if(is_null($this->accessor)) {
+            $this->accessor = new PropertyAccessor();
+        }
+
+        return $this->accessor;
     }
 
     public function __construct($baseuri = '')
@@ -80,6 +108,77 @@ class Client
 
         //return the value at the key location
         return $this->cacheObject->fetch($key, $time);
+    }
+
+    public function cget($resource = '', $data = array(), $classname = 'array', $mapcheck = false)
+    {
+        // pre-build accessor, we'll probably need it
+        $accessor = $this->getPropertyAccessor();
+
+        // Default limit
+        $limit = 60;
+
+        // Fetch if we are able to return directly
+        $direct = !(
+            is_null($offset = $accessor->get($data, $this->offsetLocalKey)) &&
+            is_null($page   = $accessor->get($data, $this->pageLocalKey))
+        );
+
+        // Return directly if possible, saves us some work
+        if ($direct) {
+            return $this->get($resource, $data, $classname, $mapcheck);
+        }
+
+        //handle first page of pagination
+        switch ($this->paginationType) {
+            case 'offset':
+                // Act as offset
+                switch ($this->offsetType) {
+                    case 'offset':
+                        // It's a match, just rename the variable
+                        $accessor->remove($data, $this->offsetLocalKey);
+                        $accessor->set($data, $this->offsetRemoteKey);
+                        return $this->get($resource, $data, $classname, $mapcheck);
+                        break;
+                    case 'page':
+                        // Pagination needs simulation
+                        $accessor->remove($data, $this->offsetLocalKey);
+                        $limit = $accessor->get($data, $this->limitLocalKey);
+
+                        // Generate page numbers
+                        $pageLow  = floor($offset/$limit);
+                        $pageHigh = ceil($offset/$limit);
+
+                        // Fetch low data
+                        $accessor->set($data, $this->pageRemoteKey, $pageLow);
+                        $dataLow  = $this->get($resource, $data, $classname, $mapcheck);
+
+                        // Fetch high data
+                        $accessor->set($data, $this->pageRemoteKey, $pageHigh);
+                        $dataHigh = $this->get($resource, $data, $classname, $mapcheck);
+
+                        // Return stuff
+                        return array_merge($dataLow, $dataHigh);
+                }
+                break;
+            case 'page':
+                // Act as paging
+                switch ($this->offsetType) {
+                    case 'offset':
+                        // Pagination needs simulation
+                        break;
+                    case 'page':
+                        // It's a match, just rename the variable
+                        break;
+                }
+                break;
+            default:
+                // Don't handle pagination
+                break;
+        }
+
+        // We failed
+        return null;
     }
 
     /**

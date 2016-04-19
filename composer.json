@@ -13,10 +13,17 @@
             "Ratus\\RestClient\\": "src"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:finwo/property-accessor.git"
+        }
+    ],
     "require": {
         "php":                    ">=5.3",
         "ext-curl":               "*",
         "finwo/cache-memcached":  "*@dev",
-        "netresearch/jsonmapper": "^0.10.0"
+        "netresearch/jsonmapper": "^0.10.0",
+        "finwo/data-tools":       "*@dev"
     }
 }

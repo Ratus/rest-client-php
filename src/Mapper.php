@@ -123,7 +123,7 @@ class Mapper implements MapperInterface
         return $result;
     }
 
-    protected static function deserialize($data)
+    public static function deserialize($data)
     {
         //prevent to run stuff that's already an array
         if(is_array($data)) return $data;
