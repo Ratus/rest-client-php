@@ -157,8 +157,24 @@ class Client
                         $accessor->set($data, $this->pageRemoteKey, $pageHigh);
                         $dataHigh = $this->get($resource, $data, $classname, $mapcheck);
 
-                        // Return stuff
-                        return array_merge($dataLow, $dataHigh);
+                        // Start building result
+                        $result = array_merge($dataLow, $dataHigh);
+
+                        // Match offset & limit to the request, return that data
+                        $remove = $offset - ($limit * $pageLow);
+                        return array_filter($resource, function($item) use (&$limit, &$remove) {
+                            // Remove first X results
+                            if (0<$remove--) {
+                                return false;
+                            }
+
+                            // Limit to X results
+                            if (0<$limit--) {
+                                return false;
+                            }
+
+                            return true;
+                        });
                 }
                 break;
             case 'page':
