@@ -65,7 +65,7 @@ class Client
     protected function getPropertyAccessor()
     {
         if(is_null($this->accessor)) {
-            $this->accessor = new PropertyAccessor();
+            $this->accessor = new PropertyAccessor(true);
         }
 
         return $this->accessor;
