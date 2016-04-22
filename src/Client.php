@@ -163,7 +163,7 @@ class Client
                         $dataHigh = $this->get($resource, json_encode($data), $classname, $mapcheck);
 
                         // Start building result
-                        $result = array_merge($dataHigh, $dataLow);
+                        $result = array_merge($dataLow, $dataHigh);
 
                         // Match offset & limit to the request, return that data
                         $remove = $offset-($limit*($pageLow-1));
