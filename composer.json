@@ -1,7 +1,7 @@
 {
     "name": "ratus/rest-client-php",
     "description": "Generic REST client",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name":  "Robin Bron",
@@ -13,17 +13,18 @@
             "Ratus\\RestClient\\": "src"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:finwo/property-accessor.git"
-        }
-    ],
+    "repositories": [{
+        "type": "vcs",
+        "url": "git@github.com:finwo/property-accessor.git"
+    },{
+        "type": "vcs",
+        "url": "git@github.com:finwo/data-tools-php.git"
+    }],
     "require": {
         "php":                    ">=5.3",
         "ext-curl":               "*",
-        "finwo/cache-memcached":  "*@dev",
-        "netresearch/jsonmapper": "^0.10.0",
-        "finwo/data-tools":       "*@dev"
+        "finwo/cache-memcached":  "*",
+        "netresearch/jsonmapper": "*",
+        "finwo/data-tools":       "*"
     }
 }
